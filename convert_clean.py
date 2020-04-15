@@ -57,43 +57,43 @@ def get_midi_info(pm):
     return midi_info
 
 
-def midi_filter(midi_info):
-    """Return True for qualified midi files and False for unwanted ones"""
-    if midi_info['first_beat_time'] > 0.0:
-        return False
-    elif midi_info['num_time_signature_change'] > 1:
-        return False
-    elif midi_info['time_signature'] not in ['4/4']:
-        return False
-    return True
+# def midi_filter(midi_info):
+#     """Return True for qualified midi files and False for unwanted ones"""
+#     if midi_info['first_beat_time'] > 0.0:
+#         return False
+#     elif midi_info['num_time_signature_change'] > 1:
+#         return False
+#     elif midi_info['time_signature'] not in ['4/4']:
+#         return False
+#     return True
 
 
-def get_merged(multitrack):
-    """Return a `pypianoroll.Multitrack` instance with piano-rolls merged to
-    five tracks (Bass, Drums, Guitar, Piano and Strings)"""
-    category_list = {'Bass': [], 'Drums': [], 'Guitar': [], 'Piano': [], 'Strings': []}
-    program_dict = {'Piano': 0, 'Drums': 0, 'Guitar': 24, 'Bass': 32, 'Strings': 48}
-
-    for idx, track in enumerate(multitrack.tracks):
-        if track.is_drum:
-            category_list['Drums'].append(idx)
-        elif track.program//8 == 0:
-            category_list['Piano'].append(idx)
-        elif track.program//8 == 3:
-            category_list['Guitar'].append(idx)
-        elif track.program//8 == 4:
-            category_list['Bass'].append(idx)
-        else:
-            category_list['Strings'].append(idx)
-
-    tracks = []
-    for key in category_list:
-        if category_list[key]:
-            merged = multitrack[category_list[key]].get_merged_pianoroll()
-            tracks.append(Track(merged, program_dict[key], key == 'Drums', key))
-        else:
-            tracks.append(Track(None, program_dict[key], key == 'Drums', key))
-    return Multitrack(None, tracks, multitrack.tempo, multitrack.downbeat, multitrack.beat_resolution, multitrack.name)
+# def get_merged(multitrack):
+#     """Return a `pypianoroll.Multitrack` instance with piano-rolls merged to
+#     five tracks (Bass, Drums, Guitar, Piano and Strings)"""
+#     category_list = {'Bass': [], 'Drums': [], 'Guitar': [], 'Piano': [], 'Strings': []}
+#     program_dict = {'Piano': 0, 'Drums': 0, 'Guitar': 24, 'Bass': 32, 'Strings': 48}
+#
+#     for idx, track in enumerate(multitrack.tracks):
+#         if track.is_drum:
+#             category_list['Drums'].append(idx)
+#         elif track.program // 8 == 0:
+#             category_list['Piano'].append(idx)
+#         elif track.program // 8 == 3:
+#             category_list['Guitar'].append(idx)
+#         elif track.program // 8 == 4:
+#             category_list['Bass'].append(idx)
+#         else:
+#             category_list['Strings'].append(idx)
+#
+#     tracks = []
+#     for key in category_list:
+#         if category_list[key]:
+#             merged = multitrack[category_list[key]].get_merged_pianoroll()
+#             tracks.append(Track(merged, program_dict[key], key == 'Drums', key))
+#         else:
+#             tracks.append(Track(None, program_dict[key], key == 'Drums', key))
+#    return Multitrack(None, tracks, multitrack.tempo, multitrack.downbeat, multitrack.beat_resolution, multitrack.name)
 
 
 def converter(filepath):
@@ -106,7 +106,8 @@ def converter(filepath):
         pm = pretty_midi.PrettyMIDI(filepath)
         midi_info = get_midi_info(pm)
         multitrack.parse_pretty_midi(pm)
-        merged = get_merged(multitrack)
+        # merged = get_merged(multitrack)
+        merged = multitrack
 
         make_sure_path_exists(converter_path)
         merged.save(os.path.join(converter_path, midi_name + '.npz'))
@@ -137,7 +138,7 @@ def main():
     make_sure_path_exists(cleaner_path)
     midi_dict_clean = {}
     for key in midi_dict:
-        if midi_filter(midi_dict[key]):
+        # if midi_filter(midi_dict[key]):
             midi_dict_clean[key] = midi_dict[key]
             count += 1
             shutil.copyfile(os.path.join(converter_path, key + '.npz'),
