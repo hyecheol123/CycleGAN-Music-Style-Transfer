@@ -90,14 +90,14 @@ class Classifer(object):
 
         # log path
         log_dir = os.path.join(self.log_dir, 'classifier_{}2{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
-                                                                             str(self.sigma_c))
+                                                                             str(self.sigma_c)))
         self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
         counter = 1
 
         # create training list (origin data with corresponding label)
         # Label for A is (1, 0), for B is (0, 1)
-        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir)))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir)))
         labelA = [(1.0, 0.0) for _ in range(len(dataA))]
         labelB = [(0.0, 1.0) for _ in range(len(dataB))]
         data_origin = dataA + dataB
@@ -108,8 +108,8 @@ class Classifer(object):
         print('Successfully create training list!')
 
         # create test list (origin data with corresponding label)
-        dataA = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir))
-        dataB = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir)))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir)))
         labelA = [(1.0, 0.0) for _ in range(len(dataA))]
         labelB = [(0.0, 1.0) for _ in range(len(dataB))]
         data_origin = dataA + dataB
@@ -203,7 +203,7 @@ class Classifer(object):
                                                                                     self.model,
                                                                                     self.sigma_d,
                                                                                     self.now_datetime,
-                                                                                    args.which_direction))
+                                                                                    args.which_direction)))
         sample_files_origin.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[0]))
 
         # load the origin samples in npy format and sorted in ascending order
@@ -212,7 +212,7 @@ class Classifer(object):
                                                                                         self.model,
                                                                                         self.sigma_d,
                                                                                         self.now_datetime,
-                                                                                        args.which_direction))
+                                                                                        args.which_direction)))
         sample_files_transfer.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[0]))
 
         # load the origin samples in npy format and sorted in ascending order
@@ -221,7 +221,7 @@ class Classifer(object):
                                                                                   self.model,
                                                                                   self.sigma_d,
                                                                                   self.now_datetime,
-                                                                                  args.which_direction))
+                                                                                  args.which_direction)))
         sample_files_cycle.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[0]))
 
         # put the origin, transfer and cycle of the same phrase in one zip

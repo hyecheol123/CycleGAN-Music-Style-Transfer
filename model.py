@@ -202,14 +202,14 @@ class cyclegan(object):
 
         # define the path which stores the log file, format is "{A}2{B}_{date}_{model}_{sigma}".
         log_dir = os.path.join(self.log_dir, '{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
-                                                                     self.model, self.sigma_d)
+                                                                     self.model, self.sigma_d))
         # log_dir = './logs/{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, '2018-06-10',
         #                                          self.model, self.sigma_d)
         self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
 
         # Data from domain A and B, and mixed dataset for partial and full models.
-        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir)))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir)))
         if self.model == 'partial':
             data_mixed = dataA + dataB
         if self.model == 'full': # TODO Needs to be fixed
@@ -357,8 +357,8 @@ class cyclegan(object):
         print('Processing sample......')
 
         # Testing data from 2 domains A and B and sorted in ascending order
-        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir)))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir)))
         dataA.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
         dataB.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
 
@@ -389,9 +389,9 @@ class cyclegan(object):
         init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         if args.which_direction == 'AtoB':
-            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir))
+            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir)))
         elif args.which_direction == 'BtoA':
-            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir))
+            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir)))
         else:
             raise Exception('--which_direction must be AtoB or BtoA')
         sample_files.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
