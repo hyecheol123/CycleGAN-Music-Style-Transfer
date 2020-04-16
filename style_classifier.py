@@ -44,16 +44,16 @@ class Classifer(object):
                                       args.phase == 'train'))
         self._build_model()
         self.now_datetime = get_now_datetime()
-        self.saver = tf.train.Saver()
+        self.saver = tf.compat.v1.train.Saver()
 
     def _build_model(self):
 
         # define some placeholders
-        self.origin_train = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+        self.origin_train = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                         self.input_c_dim])
-        self.label_train = tf.placeholder(tf.float32, [self.batch_size, 2])
-        self.origin_test = tf.placeholder(tf.float32, [None, self.time_step, self.pitch_range, self.input_c_dim])
-        self.label_test = tf.placeholder(tf.float32, [None, 2])
+        self.label_train = tf.compat.v1.placeholder(tf.float32, [self.batch_size, 2])
+        self.origin_test = tf.compat.v1.placeholder(tf.float32, [None, self.time_step, self.pitch_range, self.input_c_dim])
+        self.label_test = tf.compat.v1.placeholder(tf.float32, [None, 2])
 
         # Origin samples passed through the classifier
         self.D_origin = self.discriminator(self.origin_train, self.options, False, name='classifier')
@@ -61,7 +61,7 @@ class Classifer(object):
 
         # Discriminator loss
         self.d_loss = self.criterionGAN(self.D_origin, self.label_train)
-        self.d_loss_sum = tf.summary.scalar('d_loss', self.d_loss)
+        self.d_loss_sum = tf.compat.v1.summary.scalar('d_loss', self.d_loss)
 
         # test accuracy
         self.D_test_softmax = tf.nn.softmax(self.D_test)
@@ -69,11 +69,11 @@ class Classifer(object):
         self.accuracy_test = tf.reduce_mean(tf.cast(self.correct_prediction_test, tf.float32))
 
         # test midi
-        self.test_midi = tf.placeholder(tf.float32, [None, self.time_step, self.pitch_range, self.input_c_dim])
+        self.test_midi = tf.compat.v1.placeholder(tf.float32, [None, self.time_step, self.pitch_range, self.input_c_dim])
         self.test_result = self.discriminator(self.test_midi, self.options, True, name='classifier')
         self.test_result_softmax = tf.nn.softmax(self.test_result)
 
-        t_vars = tf.trainable_variables()
+        t_vars = tf.compat.v1.trainable_variables()
         self.d_vars = [var for var in t_vars if 'classifier' in var.name]
         for var in t_vars:
             print(var.name)
@@ -81,18 +81,18 @@ class Classifer(object):
     def train(self, args):
 
         # learning rate
-        self.lr = tf.placeholder(tf.float32, None, name='learning_rate')
+        self.lr = tf.compat.v1.placeholder(tf.float32, None, name='learning_rate')
 
         # Optimizer
-        self.d_optim = tf.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.d_loss, var_list=self.d_vars)
+        self.d_optim = tf.compat.v1.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.d_loss, var_list=self.d_vars)
 
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
 
         # log path
         log_dir = './logs/classifier_{}2{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
                                                          str(self.sigma_c))
-        self.writer = tf.summary.FileWriter(log_dir, self.sess.graph)
+        self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
         counter = 1
 
         # create training list (origin data with corresponding label)
@@ -196,7 +196,7 @@ class Classifer(object):
             return False
 
     def test(self, args):
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         # load the origin samples in npy format and sorted in ascending order
         sample_files_origin = glob('./test/{}2{}_{}_{}_{}/{}/npy/origin/*.*'.format(self.dataset_A_dir,
@@ -317,7 +317,7 @@ class Classifer(object):
         print('Accuracy of this classifier on test datasets is :', accuracy_origin, accuracy_transfer, accuracy_cycle)
 
     def test_famous(self, args):
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
 
         song_o = np.load('./datasets/famous_songs/C2J/merged_npy/Scenes from Childhood (Schumann).npy')

@@ -21,12 +21,12 @@ def softmax_criterion(logits, labels):
 
 
 def discriminator_midinet(image, options, reuse=False, name="discriminator"):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         # image is 256 x 256 x input_c_dim
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         h0 = lrelu(batch_norm(conv2d(image, options.df_dim, name='d_h0_conv'), name='d_h0_conv_bn'))
         # h0 is (128 x 128 x self.df_dim)
@@ -42,11 +42,11 @@ def discriminator_midinet(image, options, reuse=False, name="discriminator"):
 
 def generator_midinet(image, options, reuse=False, name='generator'):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         # h0 = lrelu(batch_norm(conv2d(image, options.df_dim, name='g_h0_conv'), name='g_h0_conv_bn'))
         # h1 = lrelu(batch_norm(conv2d(h0, options.df_dim * 2, name='g_h1_conv'), name='g_h1_conv_bn'))
@@ -68,11 +68,11 @@ def generator_midinet(image, options, reuse=False, name='generator'):
 
 def discriminator_musegan_bar(input, reuse=False, name='discriminator_bar'):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         ## conv
         h0 = lrelu(conv2d(input, 128, [1, 12], [1, 12], padding='VALID', name='d_h0_conv'))
@@ -90,11 +90,11 @@ def discriminator_musegan_bar(input, reuse=False, name='discriminator_bar'):
 
 
 def discriminator_musegan_phase(input, reuse=False, name='discriminator_phase'):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         ## conv
         h0 = lrelu(conv2d(tf.expand_dims(input, axis=2), 512, [2, 1], [1, 1], padding='VALID', name='d_h0_conv'))
@@ -109,11 +109,11 @@ def discriminator_musegan_phase(input, reuse=False, name='discriminator_phase'):
 
 def generator_musegan_bar(input, output_dim, reuse=False, name='generator_bar'):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         h0 = tf.reshape(input, tf.stack([-1, 1, 1, input.get_shape()[1]]))
         h0 = relu(batch_norm(deconv2d(h0, 1024, [1, 1], [1, 1], padding='VALID', name='g_h0_deconv'),
@@ -144,11 +144,11 @@ def generator_musegan_bar(input, output_dim, reuse=False, name='generator_bar'):
 
 
 def generator_musegan_phase(input, output_dim, reuse=False, name='generator_phase'):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         h0 = tf.reshape(input, tf.stack([-1, 1, 1, input.get_shape()[1]]))
         h0 = relu(batch_norm(deconv2d(h0, 1024, [2, 1], [2, 1], padding='VALID', name='g_h1_deconv'),
@@ -162,12 +162,12 @@ def generator_musegan_phase(input, output_dim, reuse=False, name='generator_phas
 
 def discriminator(image, options, reuse=False, name="discriminator"):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         # image is 256 x 256 x input_c_dim
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         # h0 = lrelu(conv2d(image, options.df_dim, ks=[12, 12], s=[12, 12], name='d_h0_conv'))
         # h1 = lrelu(instance_norm(conv2d(h0, options.df_dim*4, ks=[4, 1], s=[4, 1], name='d_h1_conv'), 'd_bn1'))
@@ -197,12 +197,12 @@ def discriminator(image, options, reuse=False, name="discriminator"):
 def generator_unet(image, options, reuse=False, name="generator"):
 
     dropout_rate = 0.5 if options.is_training else 1.0
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         # image is 256 x 256 x input_c_dim
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         # image is (256 x 256 x input_c_dim)
         e1 = instance_norm(conv2d(image, options.gf_dim, name='g_e1_conv'))
@@ -261,12 +261,12 @@ def generator_unet(image, options, reuse=False, name="generator"):
 
 def generator_resnet(image, options, reuse=False, name="generator"):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         # image is 256 x 256 x input_c_dim
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
 
         def residule_block(x, dim, ks=3, s=1, name='res'):
             # e.g, x is (# of images * 128 * 128 * 3)
@@ -337,12 +337,12 @@ def generator_resnet(image, options, reuse=False, name="generator"):
 
 def discriminator_classifier(image, options, reuse=False, name="discriminator"):
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         # image is 256 x 256 x input_c_dim
         if reuse:
-            tf.get_variable_scope().reuse_variables()
+            tf.compat.v1.get_variable_scope().reuse_variables()
         else:
-            assert tf.get_variable_scope().reuse is False
+            assert tf.compat.v1.get_variable_scope().reuse is False
         # # input is 384, 84, 1
         # h0 = lrelu(conv2d(image, options.df_dim, [12, 12], [12, 12], name='d_h0_conv'))
         # # h0 is (32 x 7 x self.df_dim)
@@ -371,7 +371,7 @@ def discriminator_classifier(image, options, reuse=False, name="discriminator"):
 
 def PhraseGenerator(in_tensor, output_dim, reuse=False, name='generator'):
 
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         h0 = tf.reshape(in_tensor, tf.stack([-1, 1, 1, in_tensor.get_shape()[1]]))
         h0 = relu(batch_norm(deconv2d_musegan(tensor_in=h0,
                                               out_shape=[2, 1],
@@ -394,7 +394,7 @@ def PhraseGenerator(in_tensor, output_dim, reuse=False, name='generator'):
 
 def BarGenerator(in_tensor, output_dim, reuse=False, name='generator'):
 
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
 
         h0 = tf.reshape(in_tensor, tf.stack([-1, 1, 1, in_tensor.get_shape()[1]]))
         h0 = relu(batch_norm(deconv2d_musegan(h0, [1, 1], 1024, kernels=[1, 1], strides=[1, 1], name='h0'), 'h0_bn'))
@@ -419,7 +419,7 @@ def BarGenerator(in_tensor, output_dim, reuse=False, name='generator'):
 
 def BarDiscriminator(in_tensor, reuse=False, name='discriminator'):
 
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
 
         ## conv
         h0 = lrelu(conv2d_musegan(in_tensor, 128, kernels=[1, 12], strides=[1, 12], name='h0'))
@@ -439,7 +439,7 @@ def BarDiscriminator(in_tensor, reuse=False, name='discriminator'):
 
 def PhraseDiscriminator(in_tensor, reuse=False, name='discriminator'):
 
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
 
         ## conv
         h0 = lrelu(conv2d_musegan(tf.expand_dims(in_tensor, axis=2), 512, kernels=[2, 1], strides=[1, 1], name='h0'))

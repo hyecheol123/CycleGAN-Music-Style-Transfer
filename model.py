@@ -51,23 +51,23 @@ class cyclegan(object):
                                       args.phase == 'train'))
 
         self._build_model()
-        self.saver = tf.train.Saver(max_to_keep=30)
+        self.saver = tf.compat.v1.train.Saver(max_to_keep=30)
         self.now_datetime = get_now_datetime()
         self.pool = ImagePool(args.max_size)
 
     def _build_model(self):
 
         # define some placeholders
-        self.real_data = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+        self.real_data = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                      self.input_c_dim + self.output_c_dim], name='real_A_and_B')
         if self.model != 'base':
-            self.real_mixed = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+            self.real_mixed = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                           self.input_c_dim], name='real_A_and_B_mixed')
 
         self.real_A = self.real_data[:, :, :, :self.input_c_dim]
         self.real_B = self.real_data[:, :, :, self.input_c_dim:self.input_c_dim + self.output_c_dim]
 
-        self.gaussian_noise = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+        self.gaussian_noise = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                           self.input_c_dim], name='gaussian_noise')
         # Generator: A - B - A
         self.fake_B = self.generator(self.real_A, self.options, False, name="generatorA2B")
@@ -94,9 +94,9 @@ class cyclegan(object):
         self.DB_real = self.discriminator(self.real_B + self.gaussian_noise, self.options, reuse=True,
                                           name="discriminatorB")
 
-        self.fake_A_sample = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+        self.fake_A_sample = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                          self.input_c_dim], name='fake_A_sample')
-        self.fake_B_sample = tf.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
+        self.fake_B_sample = tf.compat.v1.placeholder(tf.float32, [self.batch_size, self.time_step, self.pitch_range,
                                                          self.input_c_dim], name='fake_B_sample')
         self.DA_fake_sample = self.discriminator(self.fake_A_sample + self.gaussian_noise,
                                                  self.options, reuse=True, name="discriminatorA")
@@ -138,33 +138,33 @@ class cyclegan(object):
             self.D_loss = self.d_loss + self.gamma * self.d_all_loss
 
         # Define all summaries
-        self.g_loss_a2b_sum = tf.summary.scalar("g_loss_a2b", self.g_loss_a2b)
-        self.g_loss_b2a_sum = tf.summary.scalar("g_loss_b2a", self.g_loss_b2a)
-        self.g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
-        self.cycle_loss_sum = tf.summary.scalar("cycle_loss", self.cycle_loss)
-        self.g_sum = tf.summary.merge([self.g_loss_a2b_sum, self.g_loss_b2a_sum, self.g_loss_sum, self.cycle_loss_sum])
-        self.db_loss_sum = tf.summary.scalar("db_loss", self.db_loss)
-        self.da_loss_sum = tf.summary.scalar("da_loss", self.da_loss)
-        self.d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
-        self.db_loss_real_sum = tf.summary.scalar("db_loss_real", self.db_loss_real)
-        self.db_loss_fake_sum = tf.summary.scalar("db_loss_fake", self.db_loss_fake)
-        self.da_loss_real_sum = tf.summary.scalar("da_loss_real", self.da_loss_real)
-        self.da_loss_fake_sum = tf.summary.scalar("da_loss_fake", self.da_loss_fake)
+        self.g_loss_a2b_sum = tf.compat.v1.summary.scalar("g_loss_a2b", self.g_loss_a2b)
+        self.g_loss_b2a_sum = tf.compat.v1.summary.scalar("g_loss_b2a", self.g_loss_b2a)
+        self.g_loss_sum = tf.compat.v1.summary.scalar("g_loss", self.g_loss)
+        self.cycle_loss_sum = tf.compat.v1.summary.scalar("cycle_loss", self.cycle_loss)
+        self.g_sum = tf.compat.v1.summary.merge([self.g_loss_a2b_sum, self.g_loss_b2a_sum, self.g_loss_sum, self.cycle_loss_sum])
+        self.db_loss_sum = tf.compat.v1.summary.scalar("db_loss", self.db_loss)
+        self.da_loss_sum = tf.compat.v1.summary.scalar("da_loss", self.da_loss)
+        self.d_loss_sum = tf.compat.v1.summary.scalar("d_loss", self.d_loss)
+        self.db_loss_real_sum = tf.compat.v1.summary.scalar("db_loss_real", self.db_loss_real)
+        self.db_loss_fake_sum = tf.compat.v1.summary.scalar("db_loss_fake", self.db_loss_fake)
+        self.da_loss_real_sum = tf.compat.v1.summary.scalar("da_loss_real", self.da_loss_real)
+        self.da_loss_fake_sum = tf.compat.v1.summary.scalar("da_loss_fake", self.da_loss_fake)
         if self.model != 'base':
-            self.d_all_loss_sum = tf.summary.scalar("d_all_loss", self.d_all_loss)
-            self.D_loss_sum = tf.summary.scalar("D_loss", self.d_loss)
-            self.d_sum = tf.summary.merge([self.da_loss_sum, self.da_loss_real_sum, self.da_loss_fake_sum,
+            self.d_all_loss_sum = tf.compat.v1.summary.scalar("d_all_loss", self.d_all_loss)
+            self.D_loss_sum = tf.compat.v1.summary.scalar("D_loss", self.d_loss)
+            self.d_sum = tf.compat.v1.summary.merge([self.da_loss_sum, self.da_loss_real_sum, self.da_loss_fake_sum,
                                            self.db_loss_sum, self.db_loss_real_sum, self.db_loss_fake_sum,
                                            self.d_loss_sum, self.d_all_loss_sum, self.D_loss_sum])
         else:
-            self.d_sum = tf.summary.merge([self.da_loss_sum, self.da_loss_real_sum, self.da_loss_fake_sum,
+            self.d_sum = tf.compat.v1.summary.merge([self.da_loss_sum, self.da_loss_real_sum, self.da_loss_fake_sum,
                                            self.db_loss_sum, self.db_loss_real_sum, self.db_loss_fake_sum,
                                            self.d_loss_sum])
 
         # Test
-        self.test_A = tf.placeholder(tf.float32, [None, self.time_step, self.pitch_range,
+        self.test_A = tf.compat.v1.placeholder(tf.float32, [None, self.time_step, self.pitch_range,
                                                   self.input_c_dim], name='test_A')
-        self.test_B = tf.placeholder(tf.float32, [None, self.time_step, self.pitch_range,
+        self.test_B = tf.compat.v1.placeholder(tf.float32, [None, self.time_step, self.pitch_range,
                                                   self.output_c_dim], name='test_B')
         # A - B - A
         self.testB = self.generator(self.test_A, self.options, True, name="generatorA2B")
@@ -180,7 +180,7 @@ class cyclegan(object):
         self.testA__binary = to_binary(self.testA_, 0.5)
         self.testB__binary = to_binary(self.testB_, 0.5)
 
-        t_vars = tf.trainable_variables()
+        t_vars = tf.compat.v1.trainable_variables()
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.g_vars = [var for var in t_vars if 'generator' in var.name]
         for var in t_vars:
@@ -189,16 +189,16 @@ class cyclegan(object):
     def train(self, args):
 
         # Learning rate
-        self.lr = tf.placeholder(tf.float32, None, name='learning_rate')
+        self.lr = tf.compat.v1.placeholder(tf.float32, None, name='learning_rate')
 
         # Discriminator and Generator Optimizer
         if self.model == 'base':
-            self.d_optim = tf.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.d_loss, var_list=self.d_vars)
+            self.d_optim = tf.compat.v1.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.d_loss, var_list=self.d_vars)
         else:
-            self.d_optim = tf.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.D_loss, var_list=self.d_vars)
-        self.g_optim = tf.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.g_loss, var_list=self.g_vars)
+            self.d_optim = tf.compat.v1.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.D_loss, var_list=self.d_vars)
+        self.g_optim = tf.compat.v1.train.AdamOptimizer(self.lr, beta1=args.beta1).minimize(self.g_loss, var_list=self.g_vars)
 
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
 
         # define the path which stores the log file, format is "{A}2{B}_{date}_{model}_{sigma}".
@@ -206,7 +206,7 @@ class cyclegan(object):
                                                  self.model, self.sigma_d)
         # log_dir = './logs/{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, '2018-06-10',
         #                                          self.model, self.sigma_d)
-        self.writer = tf.summary.FileWriter(log_dir, self.sess.graph)
+        self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
 
         # Data from domain A and B, and mixed dataset for partial and full models.
         dataA = glob('./datasets/{}/train/*.*'.format(self.dataset_A_dir))
@@ -387,7 +387,7 @@ class cyclegan(object):
         save_midis(fake_B__binary, './{}/B2A/{:02d}_{:04d}_cycle.mid'.format(sample_dir, epoch, idx))
 
     def test(self, args):
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         if args.which_direction == 'AtoB':
             sample_files = glob('./datasets/{}/test/*.*'.format(self.dataset_A_dir))
@@ -454,7 +454,7 @@ class cyclegan(object):
             np.save(os.path.join(npy_path_cycle, '{}_cycle.npy'.format(idx + 1)), fake_midi_cycle)
 
     def test_famous(self, args):
-        init_op = tf.global_variables_initializer()
+        init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         song = np.load('./datasets/famous_songs/P2C/merged_npy/YMCA.npy')
         print(song.shape)

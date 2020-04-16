@@ -11,7 +11,7 @@ def batch_norm(x, name="batch_norm"):
 
 
 def instance_norm(input, name="instance_norm"):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         depth = input.get_shape()[3]
         scale = tf.get_variable("scale", [depth], initializer=tf.random_normal_initializer(1.0, 0.02, dtype=tf.float32))
         offset = tf.get_variable("offset", [depth], initializer=tf.constant_initializer(0.0))
@@ -23,14 +23,14 @@ def instance_norm(input, name="instance_norm"):
 
 
 def conv2d(input_, output_dim, ks=7, s=2, stddev=0.02, padding='SAME', name="conv2d"):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=None,
                             weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
                             biases_initializer=None)
 
 
 def deconv2d(input_, output_dim, ks=7, s=2, stddev=0.02, padding='SAME', name="deconv2d"):
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         return slim.conv2d_transpose(input_, output_dim, ks, s, padding=padding, activation_fn=None,
                                     weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
                                     biases_initializer=None)
@@ -50,7 +50,7 @@ def relu(tensor_in):
 def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=False):
     shape = input_.get_shape().as_list()
 
-    with tf.variable_scope(scope or "Linear"):
+    with tf.compat.v1.variable_scope(scope or "Linear"):
         matrix = tf.get_variable("Matrix", [shape[1], output_size], tf.float32,
                                  tf.random_normal_initializer(stddev=stddev))
         bias = tf.get_variable("bias", [output_size],
@@ -134,9 +134,9 @@ def conv2d_musegan(tensor_in, out_channels, kernels, strides, stddev=0.02, name=
     if tensor_in is None:
         return None
     else:
-        with tf.variable_scope(name, reuse=reuse):
+        with tf.compat.v1.variable_scope(name, reuse=reuse):
 
-            print('|   |---'+tf.get_variable_scope().name, tf.get_variable_scope().reuse)
+            print('|   |---'+tf.compat.v1.get_variable_scope().name, tf.compat.v1.get_variable_scope().reuse)
 
             weights = tf.get_variable('weights', kernels+[tensor_in.get_shape()[-1], out_channels],
                                       initializer=tf.truncated_normal_initializer(stddev=stddev))
@@ -172,9 +172,9 @@ def deconv2d_musegan(tensor_in, out_shape, out_channels, kernels, strides, stdde
     if tensor_in is None:
         return None
     else:
-        with tf.variable_scope(name, reuse=reuse):
+        with tf.compat.v1.variable_scope(name, reuse=reuse):
 
-            print('|   |---'+tf.get_variable_scope().name, tf.get_variable_scope().reuse)
+            print('|   |---'+tf.compat.v1.get_variable_scope().name, tf.compat.v1.get_variable_scope().reuse)
 
             # filter : [height, width, output_channels, in_channels]
             weights = tf.get_variable('weights', kernels+[out_channels, tensor_in.get_shape()[-1]],

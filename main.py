@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 from model import cyclegan
 from style_classifier import Classifer
-tf.set_random_seed(19)
+tf.compat.v1.set_random_seed(19)
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
@@ -56,9 +56,9 @@ def main(_):
     if not os.path.exists(args.test_dir):
         os.makedirs(args.test_dir)
 
-    tfconfig = tf.ConfigProto(allow_soft_placement=True)
+    tfconfig = tf.compat.v1.ConfigProto(allow_soft_placement=True)
     tfconfig.gpu_options.allow_growth = True
-    with tf.Session(config=tfconfig) as sess:
+    with tf.compat.v1.Session(config=tfconfig) as sess:
 
         if args.type == 'cyclegan':
             model = cyclegan(sess, args)
@@ -70,4 +70,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()
