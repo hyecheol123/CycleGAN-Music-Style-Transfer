@@ -23,6 +23,7 @@ class Classifer(object):
         self.sigma_c = args.sigma_c
         self.sigma_d = args.sigma_d
         self.model = args.model
+        self.test_dir = args.test_dir
 
         self.generator = generator_resnet
         self.discriminator = discriminator_classifier
@@ -88,15 +89,15 @@ class Classifer(object):
         self.sess.run(init_op)
 
         # log path
-        log_dir = './logs/classifier_{}2{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
-                                                         str(self.sigma_c))
+        log_dir = os.path.join(self.log_dir, 'classifier_{}2{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
+                                                                             str(self.sigma_c))
         self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
         counter = 1
 
         # create training list (origin data with corresponding label)
         # Label for A is (1, 0), for B is (0, 1)
-        dataA = glob('./datasets/{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob('./datasets/{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
         labelA = [(1.0, 0.0) for _ in range(len(dataA))]
         labelB = [(0.0, 1.0) for _ in range(len(dataB))]
         data_origin = dataA + dataB
@@ -107,8 +108,8 @@ class Classifer(object):
         print('Successfully create training list!')
 
         # create test list (origin data with corresponding label)
-        dataA = glob('./datasets/{}/test/*.*'.format(self.dataset_A_dir))
-        dataB = glob('./datasets/{}/test/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir))
         labelA = [(1.0, 0.0) for _ in range(len(dataA))]
         labelB = [(0.0, 1.0) for _ in range(len(dataB))]
         data_origin = dataA + dataB
@@ -197,7 +198,7 @@ class Classifer(object):
         init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         # load the origin samples in npy format and sorted in ascending order
-        sample_files_origin = glob('./test/{}2{}_{}_{}_{}/{}/npy/origin/*.*'.format(self.dataset_A_dir,
+        sample_files_origin = glob(os.path.join(self.test_dir, '{}2{}_{}_{}_{}/{}/npy/origin/*.*'.format(self.dataset_A_dir,
                                                                                     self.dataset_B_dir,
                                                                                     self.model,
                                                                                     self.sigma_d,
@@ -206,7 +207,7 @@ class Classifer(object):
         sample_files_origin.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[0]))
 
         # load the origin samples in npy format and sorted in ascending order
-        sample_files_transfer = glob('./test/{}2{}_{}_{}_{}/{}/npy/transfer/*.*'.format(self.dataset_A_dir,
+        sample_files_transfer = glob(os.path.join(self.test_dir, '{}2{}_{}_{}_{}/{}/npy/transfer/*.*'.format(self.dataset_A_dir,
                                                                                         self.dataset_B_dir,
                                                                                         self.model,
                                                                                         self.sigma_d,
@@ -215,7 +216,7 @@ class Classifer(object):
         sample_files_transfer.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[0]))
 
         # load the origin samples in npy format and sorted in ascending order
-        sample_files_cycle = glob('./test/{}2{}_{}_{}_{}/{}/npy/cycle/*.*'.format(self.dataset_A_dir,
+        sample_files_cycle = glob(os.path.join(self.test_dir, 'test/{}2{}_{}_{}_{}/{}/npy/cycle/*.*'.format(self.dataset_A_dir,
                                                                                   self.dataset_B_dir,
                                                                                   self.model,
                                                                                   self.sigma_d,
@@ -314,7 +315,7 @@ class Classifer(object):
         accuracy_cycle = count_cycle * 1.0 / len(sample_files)
         print('Accuracy of this classifier on test datasets is :', accuracy_origin, accuracy_transfer, accuracy_cycle)
 
-    def test_famous(self, args):
+    def test_famous(self, args): # Not in use?
         init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
 

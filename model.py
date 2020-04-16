@@ -29,6 +29,7 @@ class cyclegan(object):
         self.dataset_A_dir = args.dataset_A_dir
         self.dataset_B_dir = args.dataset_B_dir
         self.sample_dir = args.sample_dir
+        self.log_dir = args.log_dir
 
         self.model = args.model
         self.discriminator = discriminator
@@ -200,18 +201,18 @@ class cyclegan(object):
         self.sess.run(init_op)
 
         # define the path which stores the log file, format is "{A}2{B}_{date}_{model}_{sigma}".
-        log_dir = './logs/{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
-                                                 self.model, self.sigma_d)
+        log_dir = os.path.join(self.log_dir, '{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, self.now_datetime,
+                                                                     self.model, self.sigma_d)
         # log_dir = './logs/{}2{}_{}_{}_{}'.format(self.dataset_A_dir, self.dataset_B_dir, '2018-06-10',
         #                                          self.model, self.sigma_d)
         self.writer = tf.compat.v1.summary.FileWriter(log_dir, self.sess.graph)
 
         # Data from domain A and B, and mixed dataset for partial and full models.
-        dataA = glob('./datasets/{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob('./datasets/{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
         if self.model == 'partial':
             data_mixed = dataA + dataB
-        if self.model == 'full':
+        if self.model == 'full': # TODO Needs to be fixed
             data_mixed = glob('./datasets/JCP_mixed/*.*')
 
         counter = 1
@@ -356,8 +357,8 @@ class cyclegan(object):
         print('Processing sample......')
 
         # Testing data from 2 domains A and B and sorted in ascending order
-        dataA = glob('./datasets/{}/train/*.*'.format(self.dataset_A_dir))
-        dataB = glob('./datasets/{}/train/*.*'.format(self.dataset_B_dir))
+        dataA = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_A_dir))
+        dataB = glob(os.path.join(self.dataset_dir, '{}/train/*.*'.format(self.dataset_B_dir))
         dataA.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
         dataB.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
 
@@ -377,20 +378,20 @@ class cyclegan(object):
         if not os.path.exists(os.path.join(sample_dir, 'A2B')):
             os.makedirs(os.path.join(sample_dir, 'A2B'))
 
-        save_midis(real_A_binary, './{}/A2B/{:02d}_{:04d}_origin.mid'.format(sample_dir, epoch, idx))
-        save_midis(fake_B_binary, './{}/A2B/{:02d}_{:04d}_transfer.mid'.format(sample_dir, epoch, idx))
-        save_midis(fake_A__binary, './{}/A2B/{:02d}_{:04d}_cycle.mid'.format(sample_dir, epoch, idx))
-        save_midis(real_B_binary, './{}/B2A/{:02d}_{:04d}_origin.mid'.format(sample_dir, epoch, idx))
-        save_midis(fake_A_binary, './{}/B2A/{:02d}_{:04d}_transfer.mid'.format(sample_dir, epoch, idx))
-        save_midis(fake_B__binary, './{}/B2A/{:02d}_{:04d}_cycle.mid'.format(sample_dir, epoch, idx))
+        save_midis(real_A_binary, '{}/A2B/{:02d}_{:04d}_origin.mid'.format(sample_dir, epoch, idx))
+        save_midis(fake_B_binary, '{}/A2B/{:02d}_{:04d}_transfer.mid'.format(sample_dir, epoch, idx))
+        save_midis(fake_A__binary, '{}/A2B/{:02d}_{:04d}_cycle.mid'.format(sample_dir, epoch, idx))
+        save_midis(real_B_binary, '{}/B2A/{:02d}_{:04d}_origin.mid'.format(sample_dir, epoch, idx))
+        save_midis(fake_A_binary, '{}/B2A/{:02d}_{:04d}_transfer.mid'.format(sample_dir, epoch, idx))
+        save_midis(fake_B__binary, '{}/B2A/{:02d}_{:04d}_cycle.mid'.format(sample_dir, epoch, idx))
 
     def test(self, args):
         init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         if args.which_direction == 'AtoB':
-            sample_files = glob('./datasets/{}/test/*.*'.format(self.dataset_A_dir))
+            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_A_dir))
         elif args.which_direction == 'BtoA':
-            sample_files = glob('./datasets/{}/test/*.*'.format(self.dataset_B_dir))
+            sample_files = glob(os.path.join(self.dataset_dir, '{}/test/*.*'.format(self.dataset_B_dir))
         else:
             raise Exception('--which_direction must be AtoB or BtoA')
         sample_files.sort(key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1]))
@@ -451,7 +452,7 @@ class cyclegan(object):
             np.save(os.path.join(npy_path_transfer, '{}_transfer.npy'.format(idx + 1)), fake_midi)
             np.save(os.path.join(npy_path_cycle, '{}_cycle.npy'.format(idx + 1)), fake_midi_cycle)
 
-    def test_famous(self, args):
+    def test_famous(self, args): ## TODO Not using?
         init_op = tf.compat.v1.global_variables_initializer()
         self.sess.run(init_op)
         song = np.load('./datasets/famous_songs/P2C/merged_npy/YMCA.npy')
