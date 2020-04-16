@@ -1,9 +1,10 @@
+Pygments==2.2.0
 folium==0.2.1
 metrics
+pypianoroll
 numpy
 scipy
 pillow
 imageio
 pretty_midi
-pypianoroll
 config
